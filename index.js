@@ -24,6 +24,50 @@ app.get("/api/hello", function (req, res) {
   res.json({greeting: 'hello API'});
 });
 
+// if data is null
+app.get("/api",(req,res) => {
+  res.json(
+    {
+      "unix": Date.now(),
+      "utc": (new Date()).toUTCString()
+    }
+  )
+});
+
+
+app.get("/api/:date",(req,res)=>{
+  let { date } = req.params;
+  let dateObj;
+
+  // 判断是否是时间戳
+  if (/^\d+$/.test(date)){
+    date = parseInt(date);
+
+    if(date.toString().length === 13){
+      dateObj = new Date(date);
+    }
+
+    if(date.toString().length === 10){
+      dateObj = new Date(date * 1000);  
+    }
+  }else{
+    // 非timestamp
+    dateObj = new Date(date);
+  }
+
+  // check if the date is invalid
+  if(isNaN(dateObj)){
+    return res.status(400).json({
+      error:"Invalid Date"
+    });
+  }
+
+  return res.json({
+    "unix":dateObj.getTime(),
+    "utc":dateObj.toUTCString()
+  })
+
+});
 
 
 // Listen on port set in environment variable or default to 3000
